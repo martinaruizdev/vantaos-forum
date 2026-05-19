@@ -1,24 +1,47 @@
-import Image from "next/image";
+import { Header } from "@/components/forum/header"
+import { Sidebar } from "@/components/forum/sidebar"
+import { CategoriesGrid } from "@/components/forum/categories-grid"
+import { StatusCards } from "@/components/forum/status-cards"
+import { Footer } from "@/components/forum/footer"
+import { MobileFab } from "@/components/forum/mobile-fab"
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            Hello, World
-          </h1>
-          
-        </div>
-      </main>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+
+      <div className="flex flex-1">
+        {/* Sidebar - Hidden on mobile */}
+        <Sidebar />
+
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col lg:ml-64">
+          <div className="flex-1 p-4 md:p-6 lg:p-8">
+            <div className="max-w-5xl mx-auto space-y-8">
+              {/* Welcome Section */}
+              <div className="space-y-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground text-balance">
+                  Welcome to VantaOS Community Forums
+                </h1>
+                <p className="text-muted-foreground text-pretty max-w-lg">
+                  Explore discussions, share ideas, and connect with others in our community.
+                </p>
+              </div>
+
+              {/* Categories Grid */}
+              <CategoriesGrid />
+
+              {/* Status Cards */}
+              <StatusCards />
+            </div>
+          </div>
+
+          <Footer />
+        </main>
+      </div>
+
+      {/* Mobile FAB */}
+      <MobileFab />
     </div>
-  );
+  )
 }
