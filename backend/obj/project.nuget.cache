@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "svDKPhQ7eB8=",
+  "success": true,
+  "projectFilePath": "/home/martina/Escritorio/vantaos-forum/backend/VantaOS.API.csproj",
+  "expectedPackageFiles": [
+    "/home/martina/.nuget/packages/microsoft.aspnetcore.openapi/10.0.7/microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
+    "/home/martina/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

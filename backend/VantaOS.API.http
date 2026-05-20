@@ -1,0 +1,6 @@
+@VantaOS.API_HostAddress = http://localhost:5149
+
+GET {{VantaOS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
