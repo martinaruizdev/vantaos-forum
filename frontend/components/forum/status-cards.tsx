@@ -5,8 +5,8 @@ const stats = [
     label: "Online Users",
     value: "1,234",
     icon: Users,
-    color: "text-emerald-400",
-    bgColor: "bg-emerald-500/20",
+    color: "text-primary",
+    bgColor: "bg-primary/20",
   },
   {
     label: "Total Topics",
@@ -19,8 +19,8 @@ const stats = [
     label: "Posts Today",
     value: "842",
     icon: TrendingUp,
-    color: "text-amber-400",
-    bgColor: "bg-amber-500/20",
+    color: "text-primary",
+    bgColor: "bg-primary/20",
   },
 ]
 

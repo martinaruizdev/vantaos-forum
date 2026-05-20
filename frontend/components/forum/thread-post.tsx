@@ -65,13 +65,13 @@ export function ThreadPost({ post }: ThreadPostProps) {
       <div className="p-6 pb-4 border-b border-border/30">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Link href={`/c/${post.community}`} className="flex items-center gap-2 group">
+            <Link href={`/f/${post.community}`} className="flex items-center gap-2 group">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-primary font-bold">
                 {post.communityIcon || post.community[0].toUpperCase()}
               </div>
               <div>
                 <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                  c/{post.community}
+                  f/{post.community}
                 </span>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Clock className="w-3 h-3" />

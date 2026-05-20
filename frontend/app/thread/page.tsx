@@ -37,7 +37,7 @@ What approaches have worked for you? I'm particularly interested in hearing abou
     avatar: "",
     role: "Senior Dev",
   },
-  community: "programming",
+  community: "kernel",
   votes: 342,
   comments: 89,
   views: 12400,
@@ -46,8 +46,8 @@ What approaches have worked for you? I'm particularly interested in hearing abou
 }
 
 const mockCommunity = {
-  name: "programming",
-  description: "A community for programmers to discuss coding, software development, and technology.",
+  name: "kernel",
+  description: "Discussions regarding process scheduling, memory management, and file system architecture.",
   members: 2400000,
   online: 12500,
   createdAt: "Jan 15, 2020",

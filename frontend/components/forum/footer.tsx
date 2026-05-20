@@ -7,8 +7,8 @@ export function Footer() {
       <div className="max-w-5xl mx-auto px-4 py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col items-center sm:items-start gap-1">
-            <span className="font-bold text-primary">NEXUS FORUM</span>
-            <p className="text-xs text-muted-foreground">2026 Nexus Forum. All rights reserved.</p>
+            <span className="font-bold text-primary">VantaOS Community Forums</span>
+            <p className="text-xs text-muted-foreground">2026 VantaOS Community Forums. All rights reserved.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-xs">
             <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Docs</Link>

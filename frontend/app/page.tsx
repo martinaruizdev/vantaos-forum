@@ -23,8 +23,8 @@ export default function HomePage() {
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground text-balance">
                   Welcome to VantaOS Community Forums
                 </h1>
-                <p className="text-muted-foreground text-pretty max-w-lg">
-                  Explore discussions, share ideas, and connect with others in our community.
+                <p className="text-muted-foreground text-pretty max-w-xl">
+                  From kernel optimizations to interface paradigms, contribute to the most sophisticated open-source ecosystem.
                 </p>
               </div>
 
