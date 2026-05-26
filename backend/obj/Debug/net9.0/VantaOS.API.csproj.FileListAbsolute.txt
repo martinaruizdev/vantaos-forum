@@ -125,3 +125,12 @@ C:\Users\Alumno\Desktop\vantaos-forum\backend\obj\Debug\net9.0\refint\VantaOS.AP
 C:\Users\Alumno\Desktop\vantaos-forum\backend\obj\Debug\net9.0\VantaOS.API.pdb
 C:\Users\Alumno\Desktop\vantaos-forum\backend\obj\Debug\net9.0\VantaOS.API.genruntimeconfig.cache
 C:\Users\Alumno\Desktop\vantaos-forum\backend\obj\Debug\net9.0\ref\VantaOS.API.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\BCrypt.Net-Next.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Alumno\Desktop\vantaos-forum\backend\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
