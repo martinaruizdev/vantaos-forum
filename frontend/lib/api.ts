@@ -99,4 +99,23 @@ export const api = {
     }
     return res.json()
   },
+
+  // ── Votes ───────────────────────────────────────────────────────────────────
+
+  /** Requiere JWT. Toggle: mismo valor → quita el voto; distinto → cambia. */
+  vote: async (
+    data: { targetId: number; targetType: "post" | "comment"; value: 1 | -1 },
+    token: string
+  ): Promise<{ newScore: number; userVote: 1 | -1 | null }> => {
+    const res = await fetch(`${API_URL}/votes`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(data),
+    })
+    if (!res.ok) {
+      const error = await res.text()
+      throw new Error(error || "Failed to vote")
+    }
+    return res.json()
+  },
 }

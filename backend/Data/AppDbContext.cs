@@ -10,6 +10,7 @@ public class AppDbContext : DbContext{
     public DbSet<Post> Posts { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Tag> Tags { get; set; }
+    public DbSet<Vote> Votes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder){
         //Tabla de relacion Posts<->Tags
@@ -24,5 +25,10 @@ public class AppDbContext : DbContext{
         .WithMany(c => c.Replies)
         .HasForeignKey(c => c.ParentId)
         .OnDelete(DeleteBehavior.Restrict);
+
+        // Un usuario solo puede tener un voto por target
+        modelBuilder.Entity<Vote>()
+        .HasIndex(v => new { v.UserId, v.TargetId, v.TargetType })
+        .IsUnique();
     }
 }

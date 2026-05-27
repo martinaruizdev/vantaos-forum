@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   ArrowBigUp,
   ArrowBigDown,
@@ -23,6 +24,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/lib/auth-context"
+import { api } from "@/lib/api"
 
 interface ThreadPostProps {
   post: {
@@ -45,17 +48,34 @@ interface ThreadPostProps {
 }
 
 export function ThreadPost({ post }: ThreadPostProps) {
-  const [votes, setVotes] = useState(post.votes)
-  const [userVote, setUserVote] = useState<"up" | "down" | null>(null)
+  const router = useRouter()
+  const { user } = useAuth()
+
+  const [score, setScore] = useState(post.votes)
+  const [userVote, setUserVote] = useState<1 | -1 | null>(null)
+  const [isVoting, setIsVoting] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  const handleVote = (type: "up" | "down") => {
-    if (userVote === type) {
-      setVotes(post.votes)
-      setUserVote(null)
-    } else {
-      setVotes(post.votes + (type === "up" ? 1 : -1) - (userVote ? (userVote === "up" ? 1 : -1) : 0))
-      setUserVote(type)
+  const handleVote = async (value: 1 | -1) => {
+    if (!user) {
+      router.push("/login")
+      return
+    }
+
+    if (isVoting) return
+    setIsVoting(true)
+
+    try {
+      const result = await api.vote(
+        { targetId: parseInt(post.id, 10), targetType: "post", value },
+        user.token
+      )
+      setScore(result.newScore)
+      setUserVote(result.userVote)
+    } catch {
+      // mantener estado previo en caso de error
+    } finally {
+      setIsVoting(false)
     }
   }
 
@@ -66,7 +86,7 @@ export function ThreadPost({ post }: ThreadPostProps) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Link href={`/f/${post.community}`} className="flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-primary font-bold">
+              <div className="w-10 h-10 rounded-lg bg-linear-to-br from-primary/30 to-primary/10 flex items-center justify-center text-primary font-bold">
                 {post.communityIcon || post.community[0].toUpperCase()}
               </div>
               <div>
@@ -154,24 +174,34 @@ export function ThreadPost({ post }: ThreadPostProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleVote("up")}
-                className={`h-9 px-3 rounded-r-none ${
-                  userVote === "up" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-primary"
+                disabled={isVoting}
+                onClick={() => handleVote(1)}
+                className={`h-9 px-3 rounded-r-none transition-colors ${
+                  userVote === 1
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-primary"
                 }`}
               >
                 <ArrowBigUp className="w-5 h-5" />
               </Button>
-              <span className={`px-2 font-semibold text-sm ${
-                userVote === "up" ? "text-primary" : userVote === "down" ? "text-destructive" : "text-foreground"
+              <span className={`px-2 font-semibold text-sm tabular-nums ${
+                userVote === 1
+                  ? "text-primary"
+                  : userVote === -1
+                  ? "text-destructive"
+                  : "text-foreground"
               }`}>
-                {votes}
+                {score}
               </span>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleVote("down")}
-                className={`h-9 px-3 rounded-l-none ${
-                  userVote === "down" ? "text-destructive bg-destructive/10" : "text-muted-foreground hover:text-destructive"
+                disabled={isVoting}
+                onClick={() => handleVote(-1)}
+                className={`h-9 px-3 rounded-l-none transition-colors ${
+                  userVote === -1
+                    ? "text-destructive bg-destructive/10"
+                    : "text-muted-foreground hover:text-destructive"
                 }`}
               >
                 <ArrowBigDown className="w-5 h-5" />

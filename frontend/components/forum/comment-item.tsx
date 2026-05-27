@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   ArrowBigUp,
   ArrowBigDown,
@@ -20,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { CommentForm } from "./comment-form"
+import { useAuth } from "@/lib/auth-context"
+import { api } from "@/lib/api"
 
 export interface Comment {
   id: string
@@ -36,23 +39,42 @@ export interface Comment {
 
 interface CommentItemProps {
   comment: Comment
+  /** ID del post al que pertenece este hilo — necesario para publicar replies */
+  postId: number
   depth?: number
 }
 
-export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
-  const [votes, setVotes] = useState(comment.votes)
-  const [userVote, setUserVote] = useState<"up" | "down" | null>(null)
+export function CommentItem({ comment, postId, depth = 0 }: CommentItemProps) {
+  const router = useRouter()
+  const { user } = useAuth()
+
+  const [score, setScore] = useState(comment.votes)
+  const [userVote, setUserVote] = useState<1 | -1 | null>(null)
+  const [isVoting, setIsVoting] = useState(false)
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [showAllReplies, setShowAllReplies] = useState(false)
 
-  const handleVote = (type: "up" | "down") => {
-    if (userVote === type) {
-      setVotes(comment.votes)
-      setUserVote(null)
-    } else {
-      setVotes(comment.votes + (type === "up" ? 1 : -1) - (userVote ? (userVote === "up" ? 1 : -1) : 0))
-      setUserVote(type)
+  const handleVote = async (value: 1 | -1) => {
+    if (!user) {
+      router.push("/login")
+      return
+    }
+
+    if (isVoting) return
+    setIsVoting(true)
+
+    try {
+      const result = await api.vote(
+        { targetId: parseInt(comment.id, 10), targetType: "comment", value },
+        user.token
+      )
+      setScore(result.newScore)
+      setUserVote(result.userVote)
+    } catch {
+      // mantener estado previo en caso de error
+    } finally {
+      setIsVoting(false)
     }
   }
 
@@ -65,13 +87,13 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
       <div className="py-4">
         {/* Comment Header */}
         <div className="flex items-start gap-3">
-          <Avatar className="w-8 h-8 border border-border flex-shrink-0">
+          <Avatar className="w-8 h-8 border border-border shrink-0">
             <AvatarImage src={comment.author.avatar} />
             <AvatarFallback className="bg-secondary text-secondary-foreground text-sm">
               {comment.author.name[0]}
             </AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1 min-w-0">
             {/* Author Info */}
             <div className="flex items-center gap-2 flex-wrap">
@@ -98,24 +120,34 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleVote("up")}
-                      className={`h-7 w-7 p-0 ${
-                        userVote === "up" ? "text-primary" : "text-muted-foreground hover:text-primary"
+                      disabled={isVoting}
+                      onClick={() => handleVote(1)}
+                      className={`h-7 w-7 p-0 transition-colors ${
+                        userVote === 1
+                          ? "text-primary"
+                          : "text-muted-foreground hover:text-primary"
                       }`}
                     >
                       <ArrowBigUp className="w-4 h-4" />
                     </Button>
-                    <span className={`text-xs font-medium min-w-[1.5rem] text-center ${
-                      userVote === "up" ? "text-primary" : userVote === "down" ? "text-destructive" : "text-muted-foreground"
+                    <span className={`text-xs font-medium min-w-6 text-center tabular-nums ${
+                      userVote === 1
+                        ? "text-primary"
+                        : userVote === -1
+                        ? "text-destructive"
+                        : "text-muted-foreground"
                     }`}>
-                      {votes}
+                      {score}
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleVote("down")}
-                      className={`h-7 w-7 p-0 ${
-                        userVote === "down" ? "text-destructive" : "text-muted-foreground hover:text-destructive"
+                      disabled={isVoting}
+                      onClick={() => handleVote(-1)}
+                      className={`h-7 w-7 p-0 transition-colors ${
+                        userVote === -1
+                          ? "text-destructive"
+                          : "text-muted-foreground hover:text-destructive"
                       }`}
                     >
                       <ArrowBigDown className="w-4 h-4" />
@@ -153,9 +185,11 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
                 {showReplyForm && (
                   <div className="mt-4">
                     <CommentForm
+                      postId={postId}
+                      parentId={parseInt(comment.id, 10)}
                       replyTo={comment.author.name}
                       placeholder="Write a reply..."
-                      onSubmit={() => setShowReplyForm(false)}
+                      onCommentAdded={() => setShowReplyForm(false)}
                     />
                   </div>
                 )}
@@ -190,7 +224,7 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
         {!collapsed && replies.length > 0 && (
           <div className="mt-2">
             {visibleReplies.map((reply) => (
-              <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
+              <CommentItem key={reply.id} comment={reply} postId={postId} depth={depth + 1} />
             ))}
             {hasMoreReplies && (
               <Button

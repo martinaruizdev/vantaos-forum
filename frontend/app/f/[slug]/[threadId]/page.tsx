@@ -154,7 +154,7 @@ export default function ThreadPage() {
                     </p>
                   )}
                   {sorted.map((comment) => (
-                    <CommentItem key={comment.id} comment={comment} />
+                    <CommentItem key={comment.id} comment={comment} postId={post.id} />
                   ))}
                 </div>
               </div>
