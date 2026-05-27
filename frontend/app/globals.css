@@ -4,138 +4,399 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ══════════════════════════════════════════════════════════
+   VantaOS Design Tokens
+   VantaOS es siempre dark — no existe modo claro.
+   ══════════════════════════════════════════════════════════ */
+:root {
+  /* ── Fondos ── */
+  --vanta-base:     #050508;
+  --vanta-surface:  #0a0a12;
+  --vanta-elevated: #0f0f1a;
+
+  /* ── Aurora mesh ── */
+  --aurora-1: #1a0533;
+  --aurora-2: #0d1f3c;
+  --aurora-3: #0a2e1f;
+  --aurora-4: #2d0a3e;
+
+  /* ── Acentos ── */
+  --accent-primary:   #7c3aed;
+  --accent-secondary: #06b6d4;
+  --accent-tertiary:  #10b981;
+  --accent-warm:      #f59e0b;
+
+  /* ── Texto ── */
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+
+  /* ── Bordes ── */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-glow:   rgba(124, 58, 237, 0.3);
+
+  /* ══════════════════════════════════════════
+     Shadcn/UI token overrides
+     Mapeados a paleta VantaOS (siempre dark)
+     ══════════════════════════════════════════ */
+  --background:          #050508;
+  --foreground:          #f1f5f9;
+
+  --card:                #0a0a12;
+  --card-foreground:     #f1f5f9;
+
+  --popover:             #0f0f1a;
+  --popover-foreground:  #f1f5f9;
+
+  --primary:             #7c3aed;
+  --primary-foreground:  #f1f5f9;
+
+  --secondary:           #0f0f1a;
+  --secondary-foreground: #94a3b8;
+
+  --muted:               #0a0a12;
+  --muted-foreground:    #475569;
+
+  --accent:              rgba(124, 58, 237, 0.15);
+  --accent-foreground:   #f1f5f9;
+
+  --destructive:         #ef4444;
+
+  --border:              rgba(255, 255, 255, 0.06);
+  --input:               rgba(255, 255, 255, 0.03);
+  --ring:                rgba(124, 58, 237, 0.5);
+
+  --radius: 0.5rem;
+
+  /* ── Sidebar ── */
+  --sidebar:                    #0a0a12;
+  --sidebar-foreground:         #f1f5f9;
+  --sidebar-primary:            #7c3aed;
+  --sidebar-primary-foreground: #f1f5f9;
+  --sidebar-accent:             rgba(124, 58, 237, 0.1);
+  --sidebar-accent-foreground:  #f1f5f9;
+  --sidebar-border:             rgba(255, 255, 255, 0.06);
+  --sidebar-ring:               rgba(124, 58, 237, 0.5);
+
+  /* ── Charts (paleta aurora) ── */
+  --chart-1: #7c3aed;
+  --chart-2: #06b6d4;
+  --chart-3: #10b981;
+  --chart-4: #f59e0b;
+  --chart-5: #ec4899;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Tailwind v4 — theme token mapping
+   ══════════════════════════════════════════════════════════ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
+  --color-background:              var(--background);
+  --color-foreground:              var(--foreground);
+  --font-sans:                     var(--font-inter);
+  --font-mono:                     var(--font-jetbrains);
+  --font-display:                  var(--font-jetbrains);
+  --color-sidebar-ring:            var(--sidebar-ring);
+  --color-sidebar-border:          var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent:          var(--sidebar-accent);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
+  --color-sidebar-primary:         var(--sidebar-primary);
+  --color-sidebar-foreground:      var(--sidebar-foreground);
+  --color-sidebar:                 var(--sidebar);
+  --color-chart-5:                 var(--chart-5);
+  --color-chart-4:                 var(--chart-4);
+  --color-chart-3:                 var(--chart-3);
+  --color-chart-2:                 var(--chart-2);
+  --color-chart-1:                 var(--chart-1);
+  --color-ring:                    var(--ring);
+  --color-input:                   var(--input);
+  --color-border:                  var(--border);
+  --color-destructive:             var(--destructive);
+  --color-accent-foreground:       var(--accent-foreground);
+  --color-accent:                  var(--accent);
+  --color-muted-foreground:        var(--muted-foreground);
+  --color-muted:                   var(--muted);
+  --color-secondary-foreground:    var(--secondary-foreground);
+  --color-secondary:               var(--secondary);
+  --color-primary-foreground:      var(--primary-foreground);
+  --color-primary:                 var(--primary);
+  --color-popover-foreground:      var(--popover-foreground);
+  --color-popover:                 var(--popover);
+  --color-card-foreground:         var(--card-foreground);
+  --color-card:                    var(--card);
+  --radius-sm:  calc(var(--radius) * 0.6);
+  --radius-md:  calc(var(--radius) * 0.8);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ── Light mode ── */
-:root {
-  --background: oklch(0.98 0.005 264);
-  --foreground: oklch(0.15 0.02 264);
-
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 264);
-
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 264);
-
-  --primary: oklch(0.55 0.22 264);
-  --primary-foreground: oklch(0.98 0 0);
-
-  --secondary: oklch(0.93 0.03 264);
-  --secondary-foreground: oklch(0.25 0.08 264);
-
-  --muted: oklch(0.93 0.015 264);
-  --muted-foreground: oklch(0.50 0.05 264);
-
-  --accent: oklch(0.90 0.06 290);
-  --accent-foreground: oklch(0.25 0.12 264);
-
-  --destructive: oklch(0.577 0.245 27.325);
-
-  --border: oklch(0.88 0.02 264);
-  --input: oklch(0.88 0.02 264);
-  --ring: oklch(0.55 0.22 264);
-
-  --radius: 0.625rem;
-
-  --sidebar: oklch(0.96 0.01 264);
-  --sidebar-foreground: oklch(0.15 0.02 264);
-  --sidebar-primary: oklch(0.55 0.22 264);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.90 0.06 290);
-  --sidebar-accent-foreground: oklch(0.25 0.12 264);
-  --sidebar-border: oklch(0.88 0.02 264);
-  --sidebar-ring: oklch(0.55 0.22 264);
+/* ══════════════════════════════════════════════════════════
+   Mesh gradient background — animación 20s
+   ══════════════════════════════════════════════════════════ */
+@keyframes meshShift {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 0%, 0% 100%;
+  }
+  100% {
+    background-position: 10% 20%, 90% 80%, 60% 40%, 20% 70%;
+  }
 }
 
-/* ── Dark mode ── */
-.dark {
-  --background: oklch(0.10 0.015 264);
-  --foreground: oklch(0.93 0.01 264);
-
-  --card: oklch(0.14 0.02 264);
-  --card-foreground: oklch(0.93 0.01 264);
-
-  --popover: oklch(0.14 0.02 264);
-  --popover-foreground: oklch(0.93 0.01 264);
-
-  --primary: oklch(0.62 0.22 264);
-  --primary-foreground: oklch(0.10 0.015 264);
-
-  --secondary: oklch(0.20 0.04 264);
-  --secondary-foreground: oklch(0.93 0.01 264);
-
-  --muted: oklch(0.18 0.03 264);
-  --muted-foreground: oklch(0.58 0.05 264);
-
-  --accent: oklch(0.25 0.08 290);
-  --accent-foreground: oklch(0.93 0.01 264);
-
-  --destructive: oklch(0.704 0.191 22.216);
-
-  --border: oklch(1 0 0 / 8%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.62 0.22 264);
-
-  --sidebar: oklch(0.13 0.02 264);
-  --sidebar-foreground: oklch(0.93 0.01 264);
-  --sidebar-primary: oklch(0.62 0.22 264);
-  --sidebar-primary-foreground: oklch(0.10 0.015 264);
-  --sidebar-accent: oklch(0.20 0.06 290);
-  --sidebar-accent-foreground: oklch(0.93 0.01 264);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.62 0.22 264);
-}
-
+/* ══════════════════════════════════════════════════════════
+   Base layer
+   ══════════════════════════════════════════════════════════ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
-    @apply font-sans;
+    color-scheme: dark;
+    font-family: var(--font-inter), 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    color: var(--text-primary);
+    background-color: var(--vanta-base);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(26, 5, 51, 0.8) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(13, 31, 60, 0.7) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 60% at 60% 30%, rgba(10, 46, 31, 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse 70% 30% at 10% 90%, rgba(45, 10, 62, 0.6) 0%, transparent 60%);
+    background-attachment: fixed;
+    background-size: 200% 200%;
+    animation: meshShift 20s ease-in-out infinite alternate;
+    min-height: 100dvh;
+  }
+
+  /* Sin parallax agresivo en móvil */
+  @media (max-width: 768px) {
+    body {
+      background-attachment: scroll;
+    }
+  }
+
+  /* ── Headings: monospace con personalidad de sistema ── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-jetbrains), 'Fira Code', monospace;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Scrollbar personalizado ── */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--vanta-base);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(124, 58, 237, 0.35);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 58, 237, 0.6);
+  }
+
+  /* ── Selección de texto ── */
+  ::selection {
+    background: rgba(124, 58, 237, 0.3);
+    color: var(--text-primary);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Components — VantaOS utilities
+   ══════════════════════════════════════════════════════════ */
+@layer components {
+
+  /* ── Glassmorphism card ── */
+  .vanta-card {
+    background: rgba(10, 10, 18, 0.7);
+    backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    box-shadow:
+      0 0 0 1px rgba(124, 58, 237, 0.05),
+      0 4px 24px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .vanta-card:hover {
+    border-color: var(--border-glow);
+    box-shadow:
+      0 0 0 1px rgba(124, 58, 237, 0.15),
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 24px rgba(124, 58, 237, 0.08);
+  }
+
+  /* ── Primary button ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--accent-primary), #5b21b6);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    color: white;
+    font-family: var(--font-jetbrains), monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  }
+
+  .btn-primary:active {
+    opacity: 0.8;
+  }
+
+  /* ── Ghost button ── */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+  }
+
+  /* ── Badges / Tags ── */
+  .vanta-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(124, 58, 237, 0.12);
+    color: #a78bfa;
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: 4px;
+    padding: 0.125rem 0.45rem;
+    white-space: nowrap;
+  }
+
+  .vanta-badge-cyan {
+    background: rgba(6, 182, 212, 0.12);
+    color: #22d3ee;
+    border-color: rgba(6, 182, 212, 0.25);
+  }
+
+  .vanta-badge-green {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+
+  .vanta-badge-amber {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.25);
+  }
+
+  /* ── Form inputs ── */
+  .vanta-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-family: var(--font-inter), sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+  }
+
+  .vanta-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .vanta-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  }
+
+  /* ── Stat display (monospace, como datos del sistema) ── */
+  .vanta-stat {
+    font-family: var(--font-jetbrains), monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Section heading (OS style) ── */
+  .vanta-heading {
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+  }
+
+  /* ── Process-style site label: vantaos://forum ── */
+  .vanta-process-label {
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 0.75rem;
+    color: var(--accent-secondary);
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+  }
+
+  /* ── Status dot animado ── */
+  .vanta-status-online {
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--accent-tertiary);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+    animation: statusPulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
+    50%       { opacity: 0.6; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+  }
+
+  /* ── Path-style category prefix ── */
+  .vanta-path {
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
   }
 }
