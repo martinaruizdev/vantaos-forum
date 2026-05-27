@@ -14,18 +14,23 @@ public class SubforumsController : ControllerBase{
         _context = context;
     }
 
-    //GET api/subforums
+    // GET api/subforums  — incluye los posts para mostrar el último en la home
     [HttpGet]
     public async Task<IActionResult> GetAll(){
-        var subforums = await _context.Subforums.ToListAsync();
+        var subforums = await _context.Subforums
+            .Include(s => s.Posts.OrderByDescending(p => p.CreatedAt))
+            .ThenInclude(p => p.User)
+            .ToListAsync();
         return Ok(subforums);
     }
 
-    //GET api/subforums/kernel
+    // GET api/subforums/kernel
     [HttpGet("{slug}")]
     public async Task<IActionResult> GetBySlug(string slug){
         var subforum = await _context.Subforums
-        .FirstOrDefaultAsync(s => s.Slug == slug);
+            .Include(s => s.Posts.OrderByDescending(p => p.CreatedAt))
+            .ThenInclude(p => p.User)
+            .FirstOrDefaultAsync(s => s.Slug == slug);
 
         if (subforum == null) return NotFound();
         return Ok(subforum);

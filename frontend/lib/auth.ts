@@ -1,6 +1,7 @@
 const API_URL = "http://localhost:5149/api"
 
 export interface AuthUser {
+  userId: number
   token: string
   username: string
   email: string

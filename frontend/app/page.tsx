@@ -4,8 +4,13 @@ import { CategoriesGrid } from "@/components/forum/categories-grid"
 import { StatusCards } from "@/components/forum/status-cards"
 import { Footer } from "@/components/forum/footer"
 import { MobileFab } from "@/components/forum/mobile-fab"
+import { api } from "@/lib/api"
 
-export default function HomePage() {
+export const revalidate = 60 // ISR: refrescar cada 60 segundos
+
+export default async function HomePage() {
+  const subforums = await api.getSubforums()
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
@@ -20,6 +25,9 @@ export default function HomePage() {
             <div className="max-w-5xl mx-auto space-y-8">
               {/* Welcome Section */}
               <div className="space-y-2">
+                <p className="text-xs font-mono text-primary uppercase tracking-widest">
+                  vantaos://forum
+                </p>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground text-balance">
                   Welcome to VantaOS Community Forums
                 </h1>
@@ -28,8 +36,8 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Categories Grid */}
-              <CategoriesGrid />
+              {/* Categories Grid — datos reales desde la API */}
+              <CategoriesGrid subforums={subforums} />
 
               {/* Status Cards */}
               <StatusCards />

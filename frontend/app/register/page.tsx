@@ -3,12 +3,14 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { authApi, saveAuth } from "@/lib/auth"
+import { authApi } from "@/lib/auth"
+import { useAuth } from "@/lib/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -20,7 +22,7 @@ export default function RegisterPage() {
     setError("")
     try {
       const user = await authApi.register({ username, email, password })
-      saveAuth(user)
+      login(user)          // actualiza el Context + guarda en localStorage
       router.push("/")
     } catch (e: any) {
       setError(e.message)

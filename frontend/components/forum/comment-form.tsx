@@ -1,26 +1,71 @@
 "use client"
 
 import { useState } from "react"
-import { Send, Image, Link2, AtSign } from "lucide-react"
+import { Send, Image, Link2, AtSign, LogIn } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/lib/auth-context"
+import { api } from "@/lib/api"
+import Link from "next/link"
 
 interface CommentFormProps {
-  onSubmit?: (content: string) => void
+  postId: number
+  onCommentAdded?: (comment: any) => void
   placeholder?: string
   replyTo?: string
+  parentId?: number
 }
 
-export function CommentForm({ onSubmit, placeholder = "What are your thoughts?", replyTo }: CommentFormProps) {
+export function CommentForm({
+  postId,
+  onCommentAdded,
+  placeholder = "What are your thoughts?",
+  replyTo,
+  parentId,
+}: CommentFormProps) {
   const [content, setContent] = useState("")
   const [isFocused, setIsFocused] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const { user } = useAuth()
 
-  const handleSubmit = () => {
-    if (content.trim() && onSubmit) {
-      onSubmit(content)
+  const handleSubmit = async () => {
+    if (!content.trim() || !user) return
+    setIsSubmitting(true)
+    setError(null)
+    try {
+      const comment = await api.createComment(
+        { content: content.trim(), postId, parentId },
+        user.token
+      )
       setContent("")
+      setIsFocused(false)
+      onCommentAdded?.(comment)
+    } catch (e: any) {
+      setError(e.message ?? "Failed to post comment")
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
+  // Usuario no autenticado
+  if (!user) {
+    return (
+      <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 p-5 flex items-center justify-between gap-4">
+        <p className="text-sm text-muted-foreground">
+          Log in to join the discussion.
+        </p>
+        <Link href="/login">
+          <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
+            <LogIn className="w-4 h-4" />
+            Log in
+          </Button>
+        </Link>
+      </div>
+    )
+  }
+
+  const initials = user.username.slice(0, 2).toUpperCase()
 
   return (
     <div className={`bg-card/80 backdrop-blur-sm rounded-xl border transition-all ${
@@ -29,8 +74,10 @@ export function CommentForm({ onSubmit, placeholder = "What are your thoughts?",
       <div className="p-4">
         <div className="flex gap-3">
           <Avatar className="w-8 h-8 border border-border flex-shrink-0">
-            <AvatarImage src="/avatar.jpg" />
-            <AvatarFallback className="bg-primary/20 text-primary text-sm">U</AvatarFallback>
+            <AvatarImage src="" />
+            <AvatarFallback className="bg-primary/20 text-primary text-sm font-bold">
+              {initials}
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             {replyTo && (
@@ -51,6 +98,10 @@ export function CommentForm({ onSubmit, placeholder = "What are your thoughts?",
         </div>
       </div>
 
+      {error && (
+        <p className="px-4 pb-2 text-xs text-destructive">{error}</p>
+      )}
+
       {(isFocused || content) && (
         <div className="px-4 py-3 border-t border-border/30 flex items-center justify-between bg-secondary/20 rounded-b-xl">
           <div className="flex items-center gap-1">
@@ -66,12 +117,12 @@ export function CommentForm({ onSubmit, placeholder = "What are your thoughts?",
           </div>
           <Button
             onClick={handleSubmit}
-            disabled={!content.trim()}
+            disabled={!content.trim() || isSubmitting}
             size="sm"
             className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
           >
             <Send className="w-4 h-4" />
-            Comment
+            {isSubmitting ? "Posting…" : "Comment"}
           </Button>
         </div>
       )}

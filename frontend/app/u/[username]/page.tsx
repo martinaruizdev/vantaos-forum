@@ -1,75 +1,107 @@
+import Link from "next/link"
+import { notFound } from "next/navigation"
 import { Header } from "@/components/forum/header"
 import { Sidebar } from "@/components/forum/sidebar"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
-  MapPin, Calendar, MessageSquare, ThumbsUp,
+  Calendar, MessageSquare,
   Eye, Award, Terminal, Zap, Star, Shield,
-  TrendingUp, ArrowBigUp, Clock
+  TrendingUp, ArrowBigUp, Clock,
 } from "lucide-react"
+import { api } from "@/lib/api"
 
 interface ProfilePageProps {
-  params: { username: string }
+  params: Promise<{ username: string }>
 }
 
-const mockUser = {
-  name: "alex_tech",
-  displayName: "Alex Thompson",
-  avatar: "",
-  bio: "Kernel developer focused on memory management and process scheduling. Contributor to VantaOS core systems.",
-  location: "Buenos Aires, AR",
-  joinedAt: "January 2023",
-  role: "Core Contributor",
-  karma: 12840,
-  posts: 342,
-  comments: 1204,
-  views: 89400,
-  expertise: [
-    { label: "Rust / C++", value: 92 },
-    { label: "Kernel Dev", value: 85 },
-    { label: "Concurrency", value: 78 },
-  ],
-  achievements: [
-    { icon: Award, label: "Top 1% Author", color: "text-amber-400", unlocked: true },
-    { icon: Terminal, label: "Code Master", color: "text-primary", unlocked: true },
-    { icon: Zap, label: "Helpful Hand", color: "text-emerald-400", unlocked: true },
-    { icon: Star, label: "Bug Squasher", color: "text-muted-foreground", unlocked: false },
-    { icon: Shield, label: "Moderator", color: "text-muted-foreground", unlocked: false },
-    { icon: TrendingUp, label: "Trending", color: "text-muted-foreground", unlocked: false },
-  ],
-  recentActivity: [
+// Logros desbloqueables basados en actividad real
+function getAchievements(karma: number, postCount: number, commentCount: number, role: string) {
+  return [
     {
-      type: "comment",
-      title: "Replied to: Fix race condition in MMU handler",
-      description: "The issue is likely in the TLB shootdown sequence. You need to ensure all CPUs have acknowledged before proceeding.",
-      forum: "kernel",
-      time: "2 hours ago",
-      votes: 42,
-      accentColor: "border-primary",
+      icon: ArrowBigUp,
+      label: "Top Author",
+      color: "text-amber-400",
+      unlocked: karma >= 50,
     },
     {
-      type: "post",
-      title: "Published: Async I/O Patterns with io_uring",
-      description: "Comprehensive guide on implementing io_uring for high-throughput network applications in VantaOS.",
-      forum: "kernel",
-      time: "Yesterday",
-      votes: 89,
-      accentColor: "border-emerald-500",
+      icon: Terminal,
+      label: "Code Master",
+      color: "text-primary",
+      unlocked: postCount >= 5,
     },
     {
-      type: "thread",
-      title: "Created Thread: Proposal for Memory Tiering API",
-      description: "Initiating discussion on exposing tiered memory primitives to userspace via the new syscall interface.",
-      forum: "drivers",
-      time: "3 days ago",
-      votes: 124,
-      accentColor: "border-violet-500",
+      icon: Zap,
+      label: "Helpful Hand",
+      color: "text-emerald-400",
+      unlocked: commentCount >= 5,
     },
-  ],
+    {
+      icon: Star,
+      label: "Bug Squasher",
+      color: "text-violet-400",
+      unlocked: karma >= 100,
+    },
+    {
+      icon: Shield,
+      label: "Moderator",
+      color: "text-cyan-400",
+      unlocked: role === "admin" || role === "moderator",
+    },
+    {
+      icon: TrendingUp,
+      label: "Trending",
+      color: "text-rose-400",
+      unlocked: karma >= 200,
+    },
+  ]
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params
+  const user = await api.getUserProfile(username)
+
+  if (!user) notFound()
+
+  const joinedAt = new Date(user.createdAt).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  })
+
+  const initials = user.username.slice(0, 2).toUpperCase()
+  const achievements = getAchievements(user.karma, user.postCount, user.commentCount, user.role)
+
+  // Intercalar posts y comentarios en actividad reciente, ordenado por fecha
+  const recentPosts = (user.posts ?? []).slice(0, 5).map((p: any) => ({
+    type: "post" as const,
+    title: `Published: ${p.title}`,
+    description: "",
+    forum: p.subforumSlug,
+    time: new Date(p.createdAt).toLocaleDateString("es-AR"),
+    votes: p.score,
+    meta: `${p.commentCount} comments`,
+    href: `/f/${p.subforumSlug}/${p.id}`,
+    accentColor: "border-emerald-500",
+  }))
+
+  const recentComments = (user.comments ?? []).slice(0, 3).map((c: any) => ({
+    type: "comment" as const,
+    title: `Replied to: ${c.postTitle}`,
+    description: c.content,
+    forum: c.subforumSlug,
+    time: new Date(c.createdAt).toLocaleDateString("es-AR"),
+    votes: c.score,
+    meta: "",
+    href: `/f/${c.subforumSlug}/${c.postId}`,
+    accentColor: "border-primary",
+  }))
+
+  const activity = [...recentPosts, ...recentComments]
+    .sort((a, b) => {
+      // Reordenar cronológicamente (más reciente primero)
+      return b.time.localeCompare(a.time)
+    })
+    .slice(0, 6)
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,57 +113,51 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
           {/* Profile Header */}
           <div className="relative bg-card/80 border border-border/50 rounded-2xl overflow-hidden mb-6">
-            {/* Banner */}
+            {/* Banner con gradiente único por usuario */}
             <div className="h-32 bg-gradient-to-r from-primary/30 via-primary/10 to-violet-500/20" />
 
             <div className="px-6 pb-6">
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-12">
                 <div className="flex items-end gap-4">
                   <Avatar className="w-24 h-24 border-4 border-card rounded-2xl">
-                    <AvatarImage src={mockUser.avatar} />
                     <AvatarFallback className="bg-primary/20 text-primary text-3xl font-bold rounded-2xl">
-                      {mockUser.displayName[0]}
+                      {initials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="mb-1">
-                    <h1 className="text-2xl font-bold text-foreground">{mockUser.displayName}</h1>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground text-sm">@{username}</span>
-                      <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
-                        {mockUser.role}
+                    <h1 className="text-2xl font-bold text-foreground">@{user.username}</h1>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-muted-foreground text-sm font-mono">{user.email}</span>
+                      <Badge className="bg-primary/20 text-primary border-primary/30 text-xs uppercase font-mono">
+                        {user.role}
                       </Badge>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Bio & Meta */}
-              <p className="text-muted-foreground mt-4 max-w-2xl leading-relaxed">{mockUser.bio}</p>
-              <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-primary" />
-                  {mockUser.location}
-                </span>
+              {/* Meta */}
+              <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-primary" />
-                  Joined {mockUser.joinedAt}
+                  Joined {joinedAt}
                 </span>
               </div>
 
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border/30">
                 {[
-                  { icon: ArrowBigUp, label: "Karma", value: mockUser.karma.toLocaleString('en-US') },
-                  { icon: MessageSquare, label: "Posts", value: mockUser.posts.toLocaleString('en-US') },
-                  { icon: MessageSquare, label: "Comments", value: mockUser.comments.toLocaleString('en-US') },
-                  { icon: Eye, label: "Views", value: mockUser.views.toLocaleString('en-US') },
+                  { icon: ArrowBigUp,    label: "Karma",    value: user.karma.toLocaleString("en-US") },
+                  { icon: MessageSquare, label: "Posts",    value: user.postCount.toLocaleString("en-US") },
+                  { icon: MessageSquare, label: "Comments", value: user.commentCount.toLocaleString("en-US") },
+                  { icon: Eye,           label: "Views",    value: "—" },
                 ].map((stat) => (
                   <div key={stat.label} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       <stat.icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-bold text-foreground">{stat.value}</p>
+                      <p className="font-bold text-foreground font-mono">{stat.value}</p>
                       <p className="text-xs text-muted-foreground">{stat.label}</p>
                     </div>
                   </div>
@@ -146,10 +172,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             {/* Recent Activity */}
             <div className="lg:col-span-2 space-y-4">
               <h2 className="font-bold text-foreground text-lg">Recent Activity</h2>
-              {mockUser.recentActivity.map((item, i) => (
-                <div
+
+              {activity.length === 0 && (
+                <div className="bg-card/80 border border-border/50 rounded-xl p-8 text-center">
+                  <p className="text-muted-foreground text-sm">No activity yet.</p>
+                </div>
+              )}
+
+              {activity.map((item, i) => (
+                <Link
                   key={i}
-                  className={`bg-card/80 border border-border/50 rounded-xl p-5 border-l-4 ${item.accentColor} hover:border-primary/30 transition-all`}
+                  href={item.href}
+                  className={`block bg-card/80 border border-border/50 rounded-xl p-5 border-l-4 ${item.accentColor} hover:border-primary/30 transition-all`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <h4 className="font-semibold text-foreground text-sm leading-snug">{item.title}</h4>
@@ -158,7 +192,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                       {item.time}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{item.description}</p>
+                  {item.description && (
+                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
                   <div className="flex items-center gap-4 mt-3">
                     <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
                       f/{item.forum}
@@ -167,8 +205,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                       <ArrowBigUp className="w-3 h-3" />
                       {item.votes}
                     </span>
+                    {item.meta && (
+                      <span className="text-xs text-muted-foreground">{item.meta}</span>
+                    )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
@@ -182,36 +223,38 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   Achievements
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
-                  {mockUser.achievements.map((a, i) => (
-                    <div key={i} className={`flex flex-col items-center gap-2 ${!a.unlocked ? "opacity-30" : ""}`}>
+                  {achievements.map((a, i) => (
+                    <div
+                      key={i}
+                      title={a.unlocked ? a.label : `${a.label} (locked)`}
+                      className={`flex flex-col items-center gap-2 ${!a.unlocked ? "opacity-30" : ""}`}
+                    >
                       <div className="w-12 h-12 rounded-full bg-secondary/50 flex items-center justify-center">
                         <a.icon className={`w-5 h-5 ${a.color}`} />
                       </div>
-                      <span className="text-[10px] text-center text-muted-foreground leading-tight">{a.label}</span>
+                      <span className="text-[10px] text-center text-muted-foreground leading-tight">
+                        {a.label}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Expertise */}
+              {/* Stats card */}
               <div className="bg-card/80 border border-border/50 rounded-xl p-5">
                 <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" />
-                  Expertise
+                  Overview
                 </h3>
-                <div className="space-y-4">
-                  {mockUser.expertise.map((skill) => (
-                    <div key={skill.label}>
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-muted-foreground">{skill.label}</span>
-                        <span className="font-semibold text-foreground">{skill.value}%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary rounded-full"
-                          style={{ width: `${skill.value}%` }}
-                        />
-                      </div>
+                <div className="space-y-3">
+                  {[
+                    { label: "Posts published", value: user.postCount },
+                    { label: "Comments written", value: user.commentCount },
+                    { label: "Total karma",      value: user.karma },
+                  ].map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">{row.label}</span>
+                      <span className="text-sm font-bold text-foreground font-mono">{row.value}</span>
                     </div>
                   ))}
                 </div>

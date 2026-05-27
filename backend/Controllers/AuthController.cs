@@ -47,6 +47,7 @@ public class AuthController : ControllerBase
 
         return Ok(new AuthResponseDto
         {
+            UserId = user.Id,
             Token = GenerateToken(user),
             Username = user.Username,
             Email = user.Email,
@@ -65,6 +66,7 @@ public class AuthController : ControllerBase
 
         return Ok(new AuthResponseDto
         {
+            UserId = user.Id,
             Token = GenerateToken(user),
             Username = user.Username,
             Email = user.Email,

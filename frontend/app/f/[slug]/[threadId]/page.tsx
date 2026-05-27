@@ -1,3 +1,7 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,16 +13,50 @@ import { CommentForm } from "@/components/forum/comment-form"
 import { CommentItem, type Comment } from "@/components/forum/comment-item"
 import { api } from "@/lib/api"
 
-interface ThreadPageProps {
-  params: Promise<{ slug: string; threadId: string }>
+function mapComment(c: any): Comment {
+  return {
+    id: String(c.id),
+    author: { name: c.user?.username ?? "unknown", avatar: "" },
+    content: c.content,
+    votes: c.score,
+    createdAt: new Date(c.createdAt).toLocaleDateString("es-AR"),
+    replies: (c.replies ?? []).map(mapComment),
+  }
 }
 
-export default async function ThreadPage({ params }: ThreadPageProps) {
-  const { slug, threadId } = await params
+export default function ThreadPage() {
+  const params = useParams()
+  const slug = params.slug as string
+  const threadId = params.threadId as string
 
-  const post = await api.getPostById(Number(threadId))
+  const [post, setPost] = useState<any>(null)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [sortBy, setSortBy] = useState<"new" | "best">("new")
 
-  if (!post || post.status === 404) {
+  useEffect(() => {
+    api.getPostById(Number(threadId)).then((data) => {
+      if (data) {
+        setPost(data)
+        setComments((data.comments ?? []).map(mapComment))
+      }
+      setLoading(false)
+    })
+  }, [threadId])
+
+  const handleCommentAdded = (newComment: any) => {
+    setComments((prev) => [mapComment(newComment), ...prev])
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground font-mono text-sm animate-pulse">loading thread…</p>
+      </div>
+    )
+  }
+
+  if (!post) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Post not found.</p>
@@ -37,9 +75,9 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
     },
     community: slug,
     votes: post.score,
-    comments: post.comments?.length ?? 0,
+    comments: comments.length,
     views: 0,
-    createdAt: new Date(post.createdAt).toLocaleDateString('es-AR'),
+    createdAt: new Date(post.createdAt).toLocaleDateString("es-AR"),
     tags: post.tags?.map((t: any) => t.name) ?? [],
   }
 
@@ -52,14 +90,10 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
     rules: [],
   }
 
-  const mappedComments: Comment[] = (post.comments ?? []).map((c: any) => ({
-    id: String(c.id),
-    author: { name: c.user?.username ?? "unknown", avatar: "" },
-    content: c.content,
-    votes: c.score,
-    createdAt: new Date(c.createdAt).toLocaleDateString('es-AR'),
-    replies: [],
-  }))
+  const sorted =
+    sortBy === "best"
+      ? [...comments].sort((a, b) => b.votes - a.votes)
+      : comments
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,23 +115,45 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <ThreadPost post={mappedPost} />
-              <CommentForm placeholder="What are your thoughts?" />
+
+              <CommentForm
+                postId={post.id}
+                onCommentAdded={handleCommentAdded}
+                placeholder="What are your thoughts?"
+              />
 
               <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50">
                 <div className="p-4 border-b border-border/30 flex items-center justify-between">
                   <h2 className="font-semibold text-foreground">
-                    Comments ({mappedComments.length})
+                    Comments ({comments.length})
                   </h2>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-2">
-                    <Filter className="w-4 h-4" />
-                    Best
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant={sortBy === "best" ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => setSortBy("best")}
+                      className="text-muted-foreground hover:text-foreground gap-1 text-xs"
+                    >
+                      <Filter className="w-3 h-3" />
+                      Best
+                    </Button>
+                    <Button
+                      variant={sortBy === "new" ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => setSortBy("new")}
+                      className="text-muted-foreground hover:text-foreground text-xs"
+                    >
+                      New
+                    </Button>
+                  </div>
                 </div>
                 <div className="divide-y divide-border/30">
-                  {mappedComments.length === 0 && (
-                    <p className="p-4 text-sm text-muted-foreground">No comments yet. Be the first!</p>
+                  {sorted.length === 0 && (
+                    <p className="p-4 text-sm text-muted-foreground">
+                      No comments yet. Be the first!
+                    </p>
                   )}
-                  {mappedComments.map((comment) => (
+                  {sorted.map((comment) => (
                     <CommentItem key={comment.id} comment={comment} />
                   ))}
                 </div>
