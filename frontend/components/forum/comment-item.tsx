@@ -10,6 +10,8 @@ import {
   Flag,
   ChevronDown,
   ChevronUp,
+  Pencil,
+  Trash2,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -18,8 +20,18 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { CommentForm } from "./comment-form"
 import { useAuth } from "@/lib/auth-context"
 import { api } from "@/lib/api"
@@ -54,6 +66,41 @@ export function CommentItem({ comment, postId, depth = 0 }: CommentItemProps) {
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [showAllReplies, setShowAllReplies] = useState(false)
+  const [isDeleted, setIsDeleted] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [editContent, setEditContent] = useState(comment.content)
+  const [currentContent, setCurrentContent] = useState(comment.content)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isEdited, setIsEdited] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const isOwner = user?.username === comment.author.name
+
+  const handleDelete = async () => {
+    if (!user) return
+    setIsDeleting(true)
+    try {
+      await api.deleteComment(parseInt(comment.id, 10), user.token)
+      setIsDeleted(true)
+    } catch {
+      setIsDeleting(false)
+      setDeleteOpen(false)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!user || !editContent.trim()) return
+    setIsSaving(true)
+    try {
+      await api.updateComment(parseInt(comment.id, 10), editContent.trim(), user.token)
+      setCurrentContent(editContent.trim())
+      setIsEdited(true)
+      setEditMode(false)
+    } catch { /* mantener estado */ } finally {
+      setIsSaving(false)
+    }
+  }
 
   const handleVote = async (value: 1 | -1) => {
     if (!user) {
@@ -82,7 +129,10 @@ export function CommentItem({ comment, postId, depth = 0 }: CommentItemProps) {
   const visibleReplies = showAllReplies ? replies : replies.slice(0, 2)
   const hasMoreReplies = replies.length > 2 && !showAllReplies
 
+  if (isDeleted) return null
+
   return (
+    <>
     <div className={`${depth > 0 ? "ml-4 sm:ml-8 pl-4 border-l-2 border-border/30" : ""}`}>
       <div className="py-4">
         {/* Comment Header */}
@@ -104,14 +154,38 @@ export function CommentItem({ comment, postId, depth = 0 }: CommentItemProps) {
                 </Badge>
               )}
               <span className="text-xs text-muted-foreground">{comment.createdAt}</span>
+              {isEdited && (
+                <span className="text-xs text-muted-foreground italic">· edited</span>
+              )}
             </div>
 
             {/* Content */}
             {!collapsed && (
               <>
-                <div className="mt-2 text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
-                  {comment.content}
-                </div>
+                {editMode ? (
+                  <div className="mt-2 space-y-2">
+                    <Textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="text-sm bg-secondary/50 border-border/50 focus:border-primary/50 min-h-[80px] resize-none"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <Button size="sm" disabled={isSaving} onClick={handleSaveEdit}
+                        className="h-7 text-xs bg-primary hover:bg-primary/90 text-primary-foreground">
+                        {isSaving ? "Saving…" : "Save"}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => { setEditMode(false); setEditContent(currentContent) }}
+                        className="h-7 text-xs text-muted-foreground hover:text-foreground">
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-2 text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
+                    {currentContent}
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex items-center gap-1 mt-3">
@@ -173,6 +247,19 @@ export function CommentItem({ comment, postId, depth = 0 }: CommentItemProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="bg-popover border-border">
+                      {isOwner && (
+                        <>
+                          <DropdownMenuItem className="gap-2 text-sm cursor-pointer" onClick={() => { setEditMode(true); setEditContent(currentContent) }}>
+                            <Pencil className="w-3.5 h-3.5" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="gap-2 text-destructive text-sm cursor-pointer" onClick={() => setDeleteOpen(true)}>
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
+                      )}
                       <DropdownMenuItem className="gap-2 text-destructive text-sm">
                         <Flag className="w-3.5 h-3.5" />
                         Report
@@ -240,5 +327,29 @@ export function CommentItem({ comment, postId, depth = 0 }: CommentItemProps) {
         )}
       </div>
     </div>
+
+    <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete comment</DialogTitle>
+          <DialogDescription>
+            This action is permanent and cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="ghost" disabled={isDeleting} onClick={() => setDeleteOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={isDeleting}
+            onClick={handleDelete}
+            className="bg-destructive hover:bg-destructive/90 text-white"
+          >
+            {isDeleting ? "Deleting…" : "Delete"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }

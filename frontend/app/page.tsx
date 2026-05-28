@@ -9,7 +9,15 @@ import { api } from "@/lib/api"
 export const revalidate = 60 // ISR: refrescar cada 60 segundos
 
 export default async function HomePage() {
-  const subforums = await api.getSubforums()
+  const subforums: any[] = await api.getSubforums()
+
+  const today = new Date().toDateString()
+  const allPosts = subforums.flatMap((s: any) => s.posts ?? [])
+  const stats = {
+    subforumCount: subforums.length,
+    totalPosts: allPosts.length,
+    postsToday: allPosts.filter((p: any) => new Date(p.createdAt).toDateString() === today).length,
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -40,7 +48,7 @@ export default async function HomePage() {
               <CategoriesGrid subforums={subforums} />
 
               {/* Status Cards */}
-              <StatusCards />
+              <StatusCards stats={stats} />
             </div>
           </div>
 

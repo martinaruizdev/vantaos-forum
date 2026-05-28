@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,7 @@ function mapComment(c: any): Comment {
 
 export default function ThreadPage() {
   const params = useParams()
+  const router = useRouter()
   const slug = params.slug as string
   const threadId = params.threadId as string
 
@@ -82,12 +83,10 @@ export default function ThreadPage() {
   }
 
   const mappedCommunity = {
-    name: slug,
-    description: `Discussions about ${slug}.`,
-    members: 0,
-    online: 0,
-    createdAt: "",
-    rules: [],
+    name: post.subforum?.name ?? slug,
+    slug,
+    description: post.subforum?.description ?? `Discussions about ${slug}.`,
+    postCount: post.subforum?.posts?.length ?? 0,
   }
 
   const sorted =
@@ -114,7 +113,10 @@ export default function ThreadPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <ThreadPost post={mappedPost} />
+              <ThreadPost
+                post={mappedPost}
+                onDeleted={() => router.push(`/f/${slug}`)}
+              />
 
               <CommentForm
                 postId={post.id}

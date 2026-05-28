@@ -21,37 +21,37 @@ function getAchievements(karma: number, postCount: number, commentCount: number,
     {
       icon: ArrowBigUp,
       label: "Top Author",
-      color: "text-amber-400",
+      color: "text-primary",
       unlocked: karma >= 50,
     },
     {
       icon: Terminal,
       label: "Code Master",
-      color: "text-primary",
+      color: "text-[#a8b4f8]",
       unlocked: postCount >= 5,
     },
     {
       icon: Zap,
       label: "Helpful Hand",
-      color: "text-emerald-400",
+      color: "text-primary",
       unlocked: commentCount >= 5,
     },
     {
       icon: Star,
       label: "Bug Squasher",
-      color: "text-violet-400",
+      color: "text-[#a8b4f8]",
       unlocked: karma >= 100,
     },
     {
       icon: Shield,
       label: "Moderator",
-      color: "text-cyan-400",
+      color: "text-primary",
       unlocked: role === "admin" || role === "moderator",
     },
     {
       icon: TrendingUp,
       label: "Trending",
-      color: "text-rose-400",
+      color: "text-[#a8b4f8]",
       unlocked: karma >= 200,
     },
   ]
@@ -81,7 +81,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     votes: p.score,
     meta: `${p.commentCount} comments`,
     href: `/f/${p.subforumSlug}/${p.id}`,
-    accentColor: "border-emerald-500",
+    accentColor: "border-[#10b981]",
   }))
 
   const recentComments = (user.comments ?? []).slice(0, 3).map((c: any) => ({
@@ -114,7 +114,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           {/* Profile Header */}
           <div className="relative bg-card/80 border border-border/50 rounded-2xl overflow-hidden mb-6">
             {/* Banner con gradiente único por usuario */}
-            <div className="h-32 bg-gradient-to-r from-primary/30 via-primary/10 to-violet-500/20" />
+            <div className="h-32 bg-gradient-to-r from-primary/30 via-primary/10 to-primary/5" />
 
             <div className="px-6 pb-6">
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-12">

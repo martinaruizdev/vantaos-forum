@@ -10,18 +10,18 @@
    ══════════════════════════════════════════════════════════ */
 :root {
   /* ── Fondos ── */
-  --vanta-base:     #050508;
-  --vanta-surface:  #0a0a12;
-  --vanta-elevated: #0f0f1a;
+  --vanta-base:     #121212;
+  --vanta-surface:  #1a1a1a;
+  --vanta-elevated: #222222;
 
   /* ── Aurora mesh ── */
-  --aurora-1: #1a0533;
+  --aurora-1: #0a1533;
   --aurora-2: #0d1f3c;
   --aurora-3: #0a2e1f;
-  --aurora-4: #2d0a3e;
+  --aurora-4: #0f1840;
 
   /* ── Acentos ── */
-  --accent-primary:   #7c3aed;
+  --accent-primary:   #7080e8;
   --accent-secondary: #06b6d4;
   --accent-tertiary:  #10b981;
   --accent-warm:      #f59e0b;
@@ -29,57 +29,57 @@
   /* ── Texto ── */
   --text-primary:   #f1f5f9;
   --text-secondary: #94a3b8;
-  --text-muted:     #475569;
+  --text-muted:     #64748b;
 
   /* ── Bordes ── */
   --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-glow:   rgba(124, 58, 237, 0.3);
+  --border-glow:   rgba(112, 128, 232, 0.3);
 
   /* ══════════════════════════════════════════
      Shadcn/UI token overrides
      Mapeados a paleta VantaOS (siempre dark)
      ══════════════════════════════════════════ */
-  --background:          #050508;
+  --background:          #121212;
   --foreground:          #f1f5f9;
 
-  --card:                #0a0a12;
+  --card:                #1a1a1a;
   --card-foreground:     #f1f5f9;
 
-  --popover:             #0f0f1a;
+  --popover:             #222222;
   --popover-foreground:  #f1f5f9;
 
-  --primary:             #7c3aed;
+  --primary:             #7080e8;
   --primary-foreground:  #f1f5f9;
 
-  --secondary:           #0f0f1a;
+  --secondary:           #222222;
   --secondary-foreground: #94a3b8;
 
-  --muted:               #0a0a12;
-  --muted-foreground:    #475569;
+  --muted:               #1a1a1a;
+  --muted-foreground:    #64748b;
 
-  --accent:              rgba(124, 58, 237, 0.15);
+  --accent:              rgba(112, 128, 232, 0.15);
   --accent-foreground:   #f1f5f9;
 
   --destructive:         #ef4444;
 
   --border:              rgba(255, 255, 255, 0.06);
   --input:               rgba(255, 255, 255, 0.03);
-  --ring:                rgba(124, 58, 237, 0.5);
+  --ring:                rgba(112, 128, 232, 0.5);
 
   --radius: 0.5rem;
 
   /* ── Sidebar ── */
-  --sidebar:                    #0a0a12;
+  --sidebar:                    #1a1a1a;
   --sidebar-foreground:         #f1f5f9;
-  --sidebar-primary:            #7c3aed;
+  --sidebar-primary:            #7080e8;
   --sidebar-primary-foreground: #f1f5f9;
-  --sidebar-accent:             rgba(124, 58, 237, 0.1);
+  --sidebar-accent:             rgba(112, 128, 232, 0.1);
   --sidebar-accent-foreground:  #f1f5f9;
   --sidebar-border:             rgba(255, 255, 255, 0.06);
-  --sidebar-ring:               rgba(124, 58, 237, 0.5);
+  --sidebar-ring:               rgba(112, 128, 232, 0.5);
 
   /* ── Charts (paleta aurora) ── */
-  --chart-1: #7c3aed;
+  --chart-1: #7080e8;
   --chart-2: #06b6d4;
   --chart-3: #10b981;
   --chart-4: #f59e0b;
@@ -94,7 +94,7 @@
   --color-foreground:              var(--foreground);
   --font-sans:                     var(--font-inter);
   --font-mono:                     var(--font-jetbrains);
-  --font-display:                  var(--font-jetbrains);
+  --font-display:                  var(--font-urbanist);
   --color-sidebar-ring:            var(--sidebar-ring);
   --color-sidebar-border:          var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -164,10 +164,10 @@
     color: var(--text-primary);
     background-color: var(--vanta-base);
     background-image:
-      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(26, 5, 51, 0.8) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(10, 21, 51, 0.8) 0%, transparent 60%),
       radial-gradient(ellipse 60% 40% at 80% 80%, rgba(13, 31, 60, 0.7) 0%, transparent 50%),
       radial-gradient(ellipse 40% 60% at 60% 30%, rgba(10, 46, 31, 0.5) 0%, transparent 50%),
-      radial-gradient(ellipse 70% 30% at 10% 90%, rgba(45, 10, 62, 0.6) 0%, transparent 60%);
+      radial-gradient(ellipse 70% 30% at 10% 90%, rgba(15, 24, 64, 0.6) 0%, transparent 60%);
     background-attachment: fixed;
     background-size: 200% 200%;
     animation: meshShift 20s ease-in-out infinite alternate;
@@ -181,13 +181,14 @@
     }
   }
 
-  /* ── Headings: monospace con personalidad de sistema ── */
+  /* ── Headings: geométrica tipo Garet, no consola ── */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-jetbrains), 'Fira Code', monospace;
+    font-family: var(--font-urbanist), 'Urbanist', sans-serif;
+    font-weight: 600;
   }
 
   h1, h2, h3 {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
   }
 
   /* ── Scrollbar personalizado ── */
@@ -201,17 +202,17 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(124, 58, 237, 0.35);
+    background: rgba(112, 128, 232, 0.35);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(124, 58, 237, 0.6);
+    background: rgba(112, 128, 232, 0.6);
   }
 
   /* ── Selección de texto ── */
   ::selection {
-    background: rgba(124, 58, 237, 0.3);
+    background: rgba(112, 128, 232, 0.3);
     color: var(--text-primary);
   }
 }
@@ -223,12 +224,12 @@
 
   /* ── Glassmorphism card ── */
   .vanta-card {
-    background: rgba(10, 10, 18, 0.7);
+    background: rgba(26, 26, 26, 0.7);
     backdrop-filter: blur(12px) saturate(150%);
     border: 1px solid var(--border-subtle);
     border-radius: 8px;
     box-shadow:
-      0 0 0 1px rgba(124, 58, 237, 0.05),
+      0 0 0 1px rgba(112, 128, 232, 0.05),
       0 4px 24px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.04);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -237,9 +238,9 @@
   .vanta-card:hover {
     border-color: var(--border-glow);
     box-shadow:
-      0 0 0 1px rgba(124, 58, 237, 0.15),
+      0 0 0 1px rgba(112, 128, 232, 0.15),
       0 8px 32px rgba(0, 0, 0, 0.5),
-      0 0 24px rgba(124, 58, 237, 0.08);
+      0 0 24px rgba(112, 128, 232, 0.08);
   }
 
   /* ── Primary button ── */
@@ -247,8 +248,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, var(--accent-primary), #5b21b6);
-    border: 1px solid rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, var(--accent-primary), #4860c8);
+    border: 1px solid rgba(112, 128, 232, 0.4);
     color: white;
     font-family: var(--font-jetbrains), monospace;
     letter-spacing: 0.05em;
@@ -263,7 +264,7 @@
 
   .btn-primary:hover {
     opacity: 0.9;
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 0 20px rgba(112, 128, 232, 0.3);
   }
 
   .btn-primary:active {
@@ -299,9 +300,9 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    background: rgba(124, 58, 237, 0.12);
-    color: #a78bfa;
-    border: 1px solid rgba(124, 58, 237, 0.25);
+    background: rgba(112, 128, 232, 0.12);
+    color: #a8b4f8;
+    border: 1px solid rgba(112, 128, 232, 0.25);
     border-radius: 4px;
     padding: 0.125rem 0.45rem;
     white-space: nowrap;
@@ -345,7 +346,7 @@
 
   .vanta-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    box-shadow: 0 0 0 3px rgba(112, 128, 232, 0.15);
   }
 
   /* ── Stat display (monospace, como datos del sistema) ── */

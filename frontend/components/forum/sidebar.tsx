@@ -2,13 +2,10 @@
 
 import Link from "next/link"
 import {
-  TrendingUp,
   RefreshCw,
-  BookOpen,
   Plus,
   BarChart3,
   Scale,
-  Home,
   Compass,
   Users,
   Flame,
@@ -35,7 +32,7 @@ export function Sidebar() {
       <div className="p-6 border-b border-border/50">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-primary font-semibold">VantaOS Community Forums</span>
+          <span className="text-primary font-semibold font-display">VantaOS Community Forums</span>
         </div>
         <span className="text-xs text-muted-foreground">v1.0.0 - Online</span>
       </div>

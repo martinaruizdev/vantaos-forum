@@ -65,6 +65,28 @@ public class CommentsController : ControllerBase
         return CreatedAtAction(nameof(GetByPost), new { postId = comment.PostId }, result);
     }
 
+    // PUT api/comments/5  ← solo el autor o admin
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateCommentDto dto)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null) return Unauthorized();
+
+        var userId = int.Parse(userIdClaim);
+        var role = User.FindFirstValue(ClaimTypes.Role);
+
+        var comment = await _context.Comments.FindAsync(id);
+        if (comment == null) return NotFound();
+
+        if (comment.UserId != userId && role != "admin")
+            return Forbid();
+
+        comment.Content = dto.Content;
+        await _context.SaveChangesAsync();
+        return Ok(comment);
+    }
+
     // DELETE api/comments/5  ← solo el autor o admin
     [HttpDelete("{id}")]
     [Authorize]

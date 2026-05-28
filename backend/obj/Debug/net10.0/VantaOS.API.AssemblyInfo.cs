@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VantaOS.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+83ab4fb6bac49667b5d05b109fd736d8795f4930")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ce999cf06c49e5fb41e1d01d4e12d852ebbb152e")]
 [assembly: System.Reflection.AssemblyProductAttribute("VantaOS.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VantaOS.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

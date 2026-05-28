@@ -14,16 +14,29 @@ import {
   Link2,
   Eye,
   Clock,
+  Pencil,
+  Trash2,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { useAuth } from "@/lib/auth-context"
 import { api } from "@/lib/api"
 
@@ -45,9 +58,10 @@ interface ThreadPostProps {
     createdAt: string
     tags?: string[]
   }
+  onDeleted?: () => void
 }
 
-export function ThreadPost({ post }: ThreadPostProps) {
+export function ThreadPost({ post, onDeleted }: ThreadPostProps) {
   const router = useRouter()
   const { user } = useAuth()
 
@@ -55,6 +69,43 @@ export function ThreadPost({ post }: ThreadPostProps) {
   const [userVote, setUserVote] = useState<1 | -1 | null>(null)
   const [isVoting, setIsVoting] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [editTitle, setEditTitle] = useState(post.title)
+  const [editContent, setEditContent] = useState(post.content)
+  const [currentTitle, setCurrentTitle] = useState(post.title)
+  const [currentContent, setCurrentContent] = useState(post.content)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isEdited, setIsEdited] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const isOwner = user?.username === post.author.name
+
+  const handleDelete = async () => {
+    if (!user) return
+    setIsDeleting(true)
+    try {
+      await api.deletePost(parseInt(post.id, 10), user.token)
+      onDeleted?.()
+    } catch {
+      setIsDeleting(false)
+      setDeleteOpen(false)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!user || !editTitle.trim() || !editContent.trim()) return
+    setIsSaving(true)
+    try {
+      await api.updatePost(parseInt(post.id, 10), { title: editTitle.trim(), content: editContent.trim() }, user.token)
+      setCurrentTitle(editTitle.trim())
+      setCurrentContent(editContent.trim())
+      setIsEdited(true)
+      setEditMode(false)
+    } catch { /* mantener estado */ } finally {
+      setIsSaving(false)
+    }
+  }
 
   const handleVote = async (value: 1 | -1) => {
     if (!user) {
@@ -80,6 +131,7 @@ export function ThreadPost({ post }: ThreadPostProps) {
   }
 
   return (
+    <>
     <article className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 overflow-hidden">
       {/* Post Header */}
       <div className="p-6 pb-4 border-b border-border/30">
@@ -96,6 +148,7 @@ export function ThreadPost({ post }: ThreadPostProps) {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Clock className="w-3 h-3" />
                   <span>{post.createdAt}</span>
+                  {isEdited && <span className="italic">· edited</span>}
                 </div>
               </div>
             </Link>
@@ -107,6 +160,19 @@ export function ThreadPost({ post }: ThreadPostProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover border-border">
+              {isOwner && (
+                <>
+                  <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => { setEditMode(true); setEditTitle(currentTitle); setEditContent(currentContent) }}>
+                    <Pencil className="w-4 h-4" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-2 text-destructive cursor-pointer" onClick={() => setDeleteOpen(true)}>
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem className="gap-2">
                 <Link2 className="w-4 h-4" />
                 Copy Link
@@ -120,9 +186,17 @@ export function ThreadPost({ post }: ThreadPostProps) {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-foreground mb-4 leading-tight">
-          {post.title}
-        </h1>
+        {editMode ? (
+          <Input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className="text-xl font-bold mb-4 bg-secondary/50 border-border/50 focus:border-primary/50"
+          />
+        ) : (
+          <h1 className="text-2xl font-bold text-foreground mb-4 leading-tight">
+            {currentTitle}
+          </h1>
+        )}
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
@@ -159,10 +233,31 @@ export function ThreadPost({ post }: ThreadPostProps) {
       </div>
 
       {/* Post Content */}
-      <div className="p-6 prose prose-invert max-w-none">
-        <div className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
-          {post.content}
-        </div>
+      <div className="p-6">
+        {editMode ? (
+          <div className="space-y-3">
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="bg-secondary/50 border-border/50 focus:border-primary/50 min-h-[160px] resize-none text-sm leading-relaxed"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Button size="sm" disabled={isSaving} onClick={handleSaveEdit}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                {isSaving ? "Saving…" : "Save changes"}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setEditMode(false); setEditTitle(currentTitle); setEditContent(currentContent) }}
+                className="text-muted-foreground hover:text-foreground">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="prose prose-invert max-w-none text-foreground/90 leading-relaxed whitespace-pre-wrap">
+            {currentContent}
+          </div>
+        )}
       </div>
 
       {/* Post Actions */}
@@ -242,5 +337,29 @@ export function ThreadPost({ post }: ThreadPostProps) {
         </div>
       </div>
     </article>
+
+    <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete post</DialogTitle>
+          <DialogDescription>
+            This action is permanent and cannot be undone. The post and all its comments will be removed.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="ghost" disabled={isDeleting} onClick={() => setDeleteOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={isDeleting}
+            onClick={handleDelete}
+            className="bg-destructive hover:bg-destructive/90 text-white"
+          >
+            {isDeleting ? "Deleting…" : "Delete"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }

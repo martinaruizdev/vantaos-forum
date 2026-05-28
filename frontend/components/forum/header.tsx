@@ -26,18 +26,27 @@ import {
   Users,
   Sun,
 } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, type KeyboardEvent } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { CreatePostDialog } from "@/components/forum/create-post-dialog"
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [isDark, setIsDark] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
   const { user, logout, isLoading } = useAuth()
   const router = useRouter()
+
+  const handleSearch = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      setMobileMenuOpen(false)
+    }
+  }
 
   useEffect(() => {
     const root = document.documentElement
@@ -61,20 +70,19 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 w-full border-b border-border/50 backdrop-blur-xl" style={{ backgroundColor: "#121212" }}>
         <div className="container mx-auto px-4">
           <div className="flex h-14 items-center justify-between gap-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <div className="relative h-8 w-8">
-                <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary to-primary/50" />
-                <div className="absolute inset-[2px] rounded-md bg-background flex items-center justify-center">
-                  <span className="font-bold text-primary text-sm">V</span>
-                </div>
-              </div>
-              <span className="font-bold text-lg hidden sm:block bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                VantaOS
-              </span>
+            <Link href="/" className="flex items-center shrink-0">
+              <Image
+                src="/vanta-dark.png"
+                alt="VantaOS"
+                width={120}
+                height={32}
+                style={{ height: "36px", width: "auto" }}
+                priority
+              />
             </Link>
 
             {/* Search - Desktop */}
@@ -82,7 +90,10 @@ export function Header() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search VantaOS..."
+                  placeholder="Search VantaOS... (Enter)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearch}
                   className="w-full pl-10 bg-secondary/50 border-border/50 focus:border-primary/50 focus:bg-secondary/70"
                 />
               </div>

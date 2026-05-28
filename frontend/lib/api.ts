@@ -25,12 +25,17 @@ export const api = {
 
   // ── Posts ──────────────────────────────────────────────────────────────────
 
-  getPosts: async (subforumSlug?: string) => {
-    const url = subforumSlug
-      ? `${API_URL}/posts?subforumSlug=${subforumSlug}`
-      : `${API_URL}/posts`
-    const res = await fetch(url)
-    if (!res.ok) return []
+  getPosts: async (
+    subforumSlug?: string,
+    page = 1,
+    pageSize = 20,
+    q?: string,
+  ): Promise<{ total: number; page: number; pageSize: number; posts: any[] }> => {
+    const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) })
+    if (subforumSlug) params.set("subforumSlug", subforumSlug)
+    if (q) params.set("q", q)
+    const res = await fetch(`${API_URL}/posts?${params}`, { cache: "no-store" })
+    if (!res.ok) return { total: 0, page, pageSize, posts: [] }
     return res.json()
   },
 
@@ -54,6 +59,17 @@ export const api = {
       const error = await res.text()
       throw new Error(error || "Failed to create post")
     }
+    return res.json()
+  },
+
+  /** Requiere JWT */
+  updatePost: async (id: number, data: { title: string; content: string }, token: string) => {
+    const res = await fetch(`${API_URL}/posts/${id}`, {
+      method: "PUT",
+      headers: authHeaders(token),
+      body: JSON.stringify(data),
+    })
+    if (!res.ok) throw new Error("Failed to update post")
     return res.json()
   },
 
@@ -98,6 +114,26 @@ export const api = {
       throw new Error(error || "Failed to create comment")
     }
     return res.json()
+  },
+
+  /** Requiere JWT */
+  updateComment: async (id: number, content: string, token: string) => {
+    const res = await fetch(`${API_URL}/comments/${id}`, {
+      method: "PUT",
+      headers: authHeaders(token),
+      body: JSON.stringify({ content }),
+    })
+    if (!res.ok) throw new Error("Failed to update comment")
+    return res.json()
+  },
+
+  /** Requiere JWT */
+  deleteComment: async (id: number, token: string) => {
+    const res = await fetch(`${API_URL}/comments/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    })
+    if (!res.ok) throw new Error("Failed to delete comment")
   },
 
   // ── Votes ───────────────────────────────────────────────────────────────────

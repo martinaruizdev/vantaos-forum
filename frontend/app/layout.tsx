@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Urbanist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/lib/auth-context";
@@ -15,12 +15,23 @@ const inter = Inter({
 });
 
 /**
- * Headings + UI labels + stats — monospace con personalidad de sistema
- * Variable: --font-jetbrains → @theme --font-mono / --font-display
+ * UI labels + stats — monospace para datos del sistema
+ * Variable: --font-jetbrains → @theme --font-mono
  */
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-jetbrains",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+/**
+ * Headings — geométrica tipo Garet, estética tech sin ser consola
+ * Variable: --font-urbanist → @theme --font-display
+ */
+const urbanist = Urbanist({
+  subsets: ["latin"],
+  variable: "--font-urbanist",
   display: "swap",
   weight: ["400", "500", "600", "700"],
 });
@@ -45,6 +56,7 @@ export default function RootLayout({
         "dark",
         inter.variable,
         jetbrainsMono.variable,
+        urbanist.variable,
       )}
     >
       <body className="min-h-full flex flex-col">
